@@ -1,0 +1,250 @@
+score=0
+
+def clean_input(text):
+
+    return "".join(char for char in text.lower() if char.isalnum())
+
+
+def ask(question,correct_answer):
+    while True:
+        try:
+            answer=(input(question))
+            return int(answer)==correct_answer
+        except ValueError:
+            print("INVALID INPUT.Try again")
+
+
+def translate(question,*answers):
+    global score
+
+    user_input=input(question)
+
+    if user_input.strip()=="":
+        print("SKIPPED QUESTION.")
+        return False
+        
+    cleaned_input = clean_input(user_input)
+    cleaned_answers=[clean_input(a) for a in answers]
+
+    if cleaned_input in cleaned_answers:
+        print("CORRECT")
+        score+=2
+        return True
+    
+    else:
+        print("WRONG\n")
+        print(f"CORRECT ANSWER:{answers[0]}")
+        return False
+    
+
+def general_quiz(question,*answers):
+    global score
+
+    user_input=input(question)
+
+    if user_input.strip()=="":
+        print("SKIPPED QUESTION.")
+        return False
+    
+    cleaned_input = clean_input(user_input)
+    cleaned_answers=[clean_input(a) for a in answers]
+
+    if cleaned_input in cleaned_answers:
+        score+=2
+        print("CORRECT")
+        return True
+    else:
+        print("WRONG\n")
+        print(f"CORRECT ANSWER:{answers[0]}")
+        return False
+    
+def save_score(name,score,total,quiz_type):
+
+    from datetime import datetime
+
+    now=datetime.now()
+    time=now.strftime("%d/%m/%Y %H:%M")
+
+    with open("scores.txt","a") as file:
+        file.write(f"{name},{score},{total},{quiz_type},{time}\n")
+        print(f"Well done!You've completed the quiz.\nResult:{score}/{total}")
+
+def show_leaderboard(quiz_type):
+    try:
+        with open ("scores.txt","r") as file:
+            scores=[]
+
+            for line in file:
+                try:
+                    name, score, total, qtype, time=line.strip().split(",")
+                except ValueError:
+                    continue
+
+                name=name.strip()
+                qtype=qtype.strip()
+
+                if qtype==quiz_type:
+                    score=int(score)
+                    total=int(total)
+                    scores.append((name,score,total))
+
+        scores.sort(key=lambda x:x[1], reverse=True)
+
+        for i,s in enumerate(scores[:5],start= 1):
+            print(f"{i}. {s[0]} - {s[1]}/{s[2]}")
+
+    except FileNotFoundError:
+        print("No scores found.")
+
+
+
+
+while True:
+    choice=clean_input(input("\nPick a quiz:\n"
+                "1.Maths Quiz\n"
+                "2.Spanish quiz\n"
+                "3.General Knowledge quiz\n"
+                ""
+                "-LEADERBOARDS-\n" 
+                "4.Maths Leaderboard\n"
+                "5.Spanish Leaderboard\n"
+                "6.General Leaderboard\n"
+                ""
+                "7.Exit\n"))
+            
+    if choice in["1","mathsquiz","maths","1mathsquiz"]:
+    
+        score=0
+
+        if ask("30+70=?\n",100):
+            print("CORRECT")
+            score+=1
+        else:
+            print("WRONG")
+
+        if ask("8*3=?\n",24):
+            print("CORRECT-good job")
+            score+=1
+        else:
+            print("WRONG-it's alright though!")
+
+        if ask("90-37=?",53):
+            print("CORRECT-well done")
+            score+=1
+        else:
+            print("WRONG-keep going.")
+        
+        if ask("120/30=?",4):
+            print("CORRECT")
+            score+=1
+        else:
+            print("WRONG-you just need a bit of practice!")
+        
+        print("\nBONUS QUESTIONS(worth 3 points):")
+
+        if ask("\nIf y=25x + 10 and x=5 ,what is y?",135):
+            print("CORRECT-was that not hard enough for ya?")
+            score+=3
+        else:
+            print("WRONG-it's only going to get harder, watch out!\n")
+        
+        print("\nTWO MORE BONUS QUESTIONS TO GO!")
+
+        if ask("\n What is x if...\n 2x+32=x+y, when y=40?",8):
+            print("CORRECT-I have one more question left for you..\n")
+            score+=3
+        else:
+            print("WRONG-just one more question left,don't worry!\n")
+        
+        if ask("\nA shirt costs £24. It is reduced by 25% in a sale.\nWhat is the new price?",18):
+            print("CORRECT-you got...")
+            score+=3
+        else:
+            print("WRONG-this was the last question!\n")
+
+        print(f"Score:{score}/13\n")
+
+        print("..SAVING YOUR RESULT..\n")
+        name=input("Enter your name:")
+        save_score( name ,score,13,"maths")
+
+
+    elif choice in["2","spanish","spanishquiz","2spanishquiz"]:
+
+        score=0
+
+        print("Each question is worth 2 whole marks!\n")
+        correct=translate("Translate(Spanish to English):\nMe gusta comer pizza.\n", 
+                    "I like to eat pizza",
+                    "I like eating pizza")
+        if correct:
+            print("\nNice!")
+
+        correct= translate("Translate(Spanish to English):Fui a la escuela en autobús.\n",
+                    "I went to school by bus",
+                    "I took the bus to school")
+        if correct:
+            print("You're doing great\n")
+
+        correct= translate("Translate(Spanish to English):Quiero comprar más libros.\n",
+                    "I want to buy more books")
+        if correct:
+            print("Just a few more questions to go!\n")
+        
+        correct= translate("Translate(Spanish to English):Odio hacer mi tarea\n",
+                    "I hate doing my homework",
+                    "I hate to do my homework",
+                    "I hate doing homework")
+        if correct:
+            print("You're really good at this!\n")
+        
+        correct=translate("Translate(English to Spanish):I have two cats and a dog\n",
+                    "Tengo dos gatos y un perro")  
+        if correct:   
+            print("Tu español es genial\n")
+        
+        print(f"Result:{score}/10\n")
+
+        print("..SAVING YOUR RESULT..\n")
+        name=input("Enter your name:")
+        save_score(name,score,10,"spanish")
+
+    elif choice in ["3","general","general knowledge","3generalknowledge"]:
+
+        score=0
+
+        general_quiz("\nWhat is the capital of France?\n","Paris")
+        general_quiz("\nWho discovered gravity when an apple fell on their head?\n","Isaac Newton","Newton")
+        general_quiz("\nWho was the first person to walk on the moon?\n","Neil Armstrong","Armstrong")
+        general_quiz("\nHow many colours does a rainbow have?\n","seven","7")
+        general_quiz("\nWhat year did WW2 end?\n","1945")
+        general_quiz("\nWho developed the theory of evolution by natural selection?\n","Charles Darwin","Darwin")
+        general_quiz("\nWhat type of a bond involves the sharing of electrons?\n","Covalent","Covalent bonds","Covalent bond")
+        general_quiz("\nWhat process do plants go through to make food using sunlight?","photosynthesis")
+
+        print(f"Result:{score}/16")
+
+        print("..SAVING YOUR RESULT..\n")
+        name=input("Enter your name:")
+        save_score(name,score,16,"general")
+
+
+
+    elif choice in["4","mathsleaderboard"]:
+        show_leaderboard("maths")
+
+    elif choice in["5","spanishleaderboard"]:
+        show_leaderboard("spanish")
+
+    elif choice in["6","generalleaderboard"]:
+        show_leaderboard("general")
+
+    elif choice in["7","exit","7exit"]:
+        print("Have a good day!")
+        break
+
+    else:
+        print("Sorry, please try again.\n")
+        continue
+
+
