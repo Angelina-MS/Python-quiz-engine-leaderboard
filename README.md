@@ -12,7 +12,7 @@ This is a terminal based Python quiz games with multiple types of quizes,scoring
 - Error handling for invalid inputs 
 - Replayable quiz loop with exit option 
 
- What I learnt:
+ What I learned:
  
 - Error handling (try/except) 
 - defining functions  
